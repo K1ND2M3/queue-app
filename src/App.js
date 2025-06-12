@@ -168,6 +168,7 @@ function AppLogic() {
   const handleAddQueueItem = async (newItemData) => {
     const token = localStorage.getItem('token');
     setShowAddPopup(false);
+
     try {
       const response = await fetch('/api/queues', {
         method: 'POST',
@@ -177,8 +178,13 @@ function AppLogic() {
         },
         body: JSON.stringify(newItemData),
       });
-      if (!response.ok) throw new Error('Failed to add');
-      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
+
+      if (!response.ok) {
+        throw new Error('Failed to add queue');
+      }
+
+      await fetchQueues();
+
     } catch (error) {
       console.error('Error adding queue:', error);
     }
