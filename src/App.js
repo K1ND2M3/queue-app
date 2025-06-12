@@ -33,7 +33,7 @@ function AppLogic() {
   useEffect(() => {
     const fetchQueues = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/queues');
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/queues`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -50,7 +50,7 @@ function AppLogic() {
 
   const handleLoginSubmit = async (username, password) => {
     try {
-        const response = await fetch('http://localhost:5000/api/users/login', {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/login`, {
             method: 'POST',
             headers: {
                 'Content-Type' : 'application/json',
@@ -89,7 +89,7 @@ function AppLogic() {
 
   const fetchQueues = useCallback(async () => {
     try {
-        const response = await fetch('http://localhost:5000/api/queues');
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/queues`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -118,7 +118,7 @@ function AppLogic() {
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch(`http://localhost:5000/api/queues/${queueId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/queues/${queueId}`, {
             method: 'DELETE',
             headers: {
               'Authorization' : `Bearer ${token}`
@@ -166,7 +166,7 @@ function AppLogic() {
     const token = localStorage.getItem('token');
     try {
         
-        const response = await fetch(`http://localhost:5000/api/queues/${updatedItem._id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/queues/${updatedItem._id}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json',
@@ -190,7 +190,7 @@ function AppLogic() {
   const handleAddQueueItem = async (newItemData) => {
     const token = localStorage.getItem('token');
     try {
-        const response = await fetch ('http://localhost:5000/api/queues', {
+        const response = await fetch (`${process.env.REACT_APP_API_URL}/api/queues`, {
             method: 'POST',
             headers: {
                 'Content-Type' : 'application/json',
