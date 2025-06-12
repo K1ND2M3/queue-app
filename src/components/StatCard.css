@@ -1,0 +1,118 @@
+.stat-card {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: left;
+    border-left: 5px solid #888;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.stat-title {
+    font-size: 1rem;
+    color: #666;
+}
+
+.stat-card.all {
+    border-left-color: #0071f8;
+}
+
+.stat-card.pending {
+    border-left-color: #f39c12;
+}
+
+.stat-card.progress {
+    border-left-color: #3498db;
+}
+
+.stat-card.completed {
+    border-left-color: #2ecc71;
+}
+
+.stat-card.cancelled {
+    border-left-color: #e74c3c;
+}
+
+.stat-card.all .stat-value { 
+    color: #0071f8;
+}
+
+.stat-card.pending .stat-value {
+    color: #f39c12; 
+}
+
+.stat-card.progress .stat-value {
+    color: #3498db;
+}
+
+.stat-card.completed .stat-value {
+    color: #2ecc71;
+}
+
+.stat-card.cancelled .stat-value {
+    color: #e74c3c;
+}
+
+/* Dark Mode */
+
+.dark-mode .stat-card {
+    background-color: #2c2a3a;
+    border-left: 5px solid #888;
+    box-shadow: none;
+}
+
+.dark-mode .stat-title {
+    color: var(--text-alter-color);
+}
+
+.dark-mode .stat-card.all {
+    border-left-color: #0071f8;
+}
+
+.dark-mode .stat-card.pending {
+    border-left-color: #f39c12;
+}
+
+.dark-mode .stat-card.progress {
+    border-left-color: #3498db;
+}
+
+.dark-mode .stat-card.completed {
+    border-left-color: #2ecc71;
+}
+
+.dark-mode .stat-card.cancelled {
+    border-left-color: #e74c3c;
+}
+
+.dark-mode .stat-card.all .stat-value {
+    color: #0071f8;
+}
+
+.dark-mode .stat-card.pending .stat-value {
+    color: #f39c12;
+}
+
+.dark-mode .stat-card.progress .stat-value {
+    color: #3498db;
+}
+
+.dark-mode .stat-card.completed .stat-value {
+    color: #2ecc71;
+}
+
+.dark-mode .stat-card.cancelled .stat-value {
+    color: #e74c3c;
+}

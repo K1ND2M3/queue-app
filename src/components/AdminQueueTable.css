@@ -1,0 +1,206 @@
+.admin-table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-queue-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--container-color);
+    background-color: #ffffff;
+}
+
+.dark-mode .admin-queue-table {
+    color: var(--text-alter-color);
+    background-color: #2c2a3a;
+}
+
+.admin-queue-table th,
+.admin-queue-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #625f7e;
+    font-family: var(--poppins-font);
+    font-weight: 400;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.dark-mode .admin-queue-table th,
+.dark-mode .admin-queue-table td {
+    border-bottom: 1px solid var(--text-alter-color);
+}
+
+.admin-queue-table th {
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.dark-mode .admin-queue-table th {
+    color: #a09fb1;
+}
+
+.admin-queue-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.admin-queue-table tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.dark-mode .admin-queue-table tbody tr:hover {
+    background-color: #312f41;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-badge.progress { 
+    background-color: rgba(52, 152, 219, 0.1); 
+    color: #3498db; 
+}
+
+.status-badge.progress::before { 
+    background-color: #3498db; 
+}
+
+.status-badge.pending { 
+    background-color: rgba(243, 156, 18, 0.1); 
+    color: #f39c12; 
+}
+
+.status-badge.pending::before { 
+    background-color: #f39c12; 
+}
+
+.status-badge.completed { 
+    background-color: rgba(46, 204, 113, 0.1); 
+    color: #2ecc71; 
+}
+
+.status-badge.completed::before { 
+    background-color: #2ecc71; 
+}
+
+.status-badge.cancelled { 
+    background-color: rgba(231, 76, 60, 0.1); 
+    color: #e74c3c; 
+}
+
+.status-badge.cancelled::before { 
+    background-color: #e74c3c; 
+}
+
+/* Action button */
+
+.action-btn {
+    background: none;
+    border: none;
+    color: #625f7e;
+}
+
+.action-btn:hover {
+    color: #000;
+}
+
+.dark-mode .action-btn:hover {
+    color: #ffffff;
+}
+
+.actions-cell {
+    position: relative;
+    text-align: center;
+}
+
+.action-menu {
+    position: absolute;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    width: 130px;
+}
+
+.action-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    color: #333;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--poppins-font);
+    width: 100%;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.action-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.action-menu-item.danger {
+    color: var(--main-color);
+}
+
+.action-menu-item.danger:hover {
+    color: white;
+    background-color: var(--main-color);
+}
+
+.no-results-cell {
+    text-align: center !important;
+    padding: 3rem 1rem !important;
+    font-size: 1.1rem;
+    font-family: var(--kanit-font);
+    color: #757575;
+    font-weight: 500;
+}
+
+.dark-mode .action-menu {
+    background-color: #3c3a4e;
+    border: 1px solid #4a485d;
+}
+
+.dark-mode .action-menu-item {
+    color: var(--text-alter-color);
+}
+
+.dark-mode .action-menu-item:hover {
+    background-color: #4a485d;
+}
+
+.dark-mode .action-menu-item.danger {
+    color: var(--main-color);
+}
+
+.dark-mode .action-menu-item.danger:hover {
+    color: white;
+    background-color: var(--main-color);
+}
+
+.dark-mode .no-results-cell {
+    color: #8c8a9e;
+}
