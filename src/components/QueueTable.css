@@ -217,6 +217,7 @@
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
+
   .dark-mode .public-queue-table tr {
     border-color: #3a384c;
     box-shadow: none;
@@ -226,11 +227,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    text-align: right !important;
     font-size: 0.9rem;
     border-bottom: 1px solid #eee;
     padding: 10px 0;
   }
+
+  .public-queue-table td:first-child {
+    text-align: left !important;
+  }
+
+  .public-queue-table td .queue-number {
+    margin: 0;
+  }
+
   .dark-mode .public-queue-table td {
     border-bottom: 1px solid #3a384c;
   }
