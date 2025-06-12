@@ -3,20 +3,20 @@
     overflow-x: auto;
 }
 
-.admin-queue-table {
+.public-queue-table {
     width: 100%;
     border-collapse: collapse;
     color: var(--container-color);
     background-color: #ffffff;
 }
 
-.dark-mode .admin-queue-table {
+.dark-mode .public-queue-table {
     color: var(--text-alter-color);
     background-color: #2c2a3a;
 }
 
-.admin-queue-table th,
-.admin-queue-table td {
+.public-queue-table th,
+.public-queue-table td {
     padding: 14px 16px;
     text-align: left;
     border-bottom: 1px solid #625f7e;
@@ -26,36 +26,36 @@
     white-space: nowrap;
 }
 
-.admin-queue-table th:first-child,
-.admin-queue-table td:first-child {
+.public-queue-table th:first-child,
+.public-queue-table td:first-child {
   text-align: center;
 }
 
-.dark-mode .admin-queue-table th,
-.dark-mode .admin-queue-table td {
+.dark-mode .public-queue-table th,
+.dark-mode .public-queue-table td {
     border-bottom: 1px solid var(--text-alter-color);
 }
 
-.admin-queue-table th {
+.public-queue-table th {
     color: #666;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.8rem;
 }
 
-.dark-mode .admin-queue-table th {
+.dark-mode .public-queue-table th {
     color: #a09fb1;
 }
 
-.admin-queue-table tbody tr {
+.public-queue-table tbody tr {
     transition: background-color 0.2s ease;
 }
 
-.admin-queue-table tbody tr:hover {
+.public-queue-table tbody tr:hover {
     background-color: #f2f2f2;
 }
 
-.dark-mode .admin-queue-table tbody tr:hover {
+.dark-mode .public-queue-table tbody tr:hover {
     background-color: #312f41;
 }
 
@@ -198,7 +198,7 @@
 }
 
 @media (max-width: 768px) {
-  .admin-queue-table thead {
+  .public-queue-table thead {
     border: none;
     clip: rect(0 0 0 0);
     height: 1px;
@@ -209,40 +209,38 @@
     width: 1px;
   }
   
-  .admin-queue-table tr {
+  .public-queue-table tr {
     display: block;
     margin-bottom: .625em;
     border-bottom: 2px solid var(--bg-color);
   }
   
-  .admin-queue-table td {
+  .public-queue-table td {
     display: block;
     text-align: right !important;
     font-size: .8em;
     border-bottom: 1px dotted #ccc;
   }
-  .light-mode .admin-queue-table td {
-    border-bottom: 1px dotted #ccc;
-  }
-  .dark-mode .admin-queue-table td {
+
+  .dark-mode .public-queue-table td {
     border-bottom: 1px dotted #3a384c;
   }
 
-  .admin-queue-table td::before {
+  .public-queue-table td::before {
     content: attr(data-label);
     float: left;
     font-weight: bold;
     text-transform: uppercase;
   }
   
-  .admin-queue-table td:last-child {
+  .public-queue-table td:last-child {
     border-bottom: 0;
   }
 
-  .admin-queue-table td:first-child {
+  .public-queue-table td:first-child {
     text-align: center !important;
   }
-  .admin-queue-table td .queue-number {
+  .public-queue-table td .queue-number {
     float: right;
   }
 }

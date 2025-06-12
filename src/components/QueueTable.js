@@ -1,5 +1,6 @@
 import React from 'react';
 import './QueueTable.css';
+import './AdminQueueTable.css';
 
 const StatusBadge = ({ status }) => {
   const statusMap = {
@@ -14,9 +15,12 @@ const StatusBadge = ({ status }) => {
 
 
 function QueueTable({ queueData }) {
+
+  const items = queueData || [];
+
   return (
     <div className="admin-table-container">
-      <table className="admin-queue-table">
+      <table className="public-queue-table">
         <thead>
           <tr>
             <th>ลำดับคิว</th>
@@ -34,9 +38,9 @@ function QueueTable({ queueData }) {
                     <span>{index + 1}</span>
                   </div>
                 </td>
-                <td>{queueItem.name}</td>
-                <td>{queueItem.type}</td>
-                <td><StatusBadge status={queueItem.status} /></td>
+                <td data-label="ลำดับคิว">{queueItem.name}</td>
+                <td data-label="ลำดับคิว">{queueItem.type}</td>
+                <td data-label="ลำดับคิว"><StatusBadge status={queueItem.status} /></td>
               </tr>
             ))
           ) : (

@@ -204,3 +204,14 @@
 .dark-mode .no-results-cell {
     color: #8c8a9e;
 }
+
+@media (max-width: 768px) {
+    .admin-queue-table th,
+    .admin-queue-table td {
+        white-space: normal;
+        word-break: break-word;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 0.9rem;
+    }
+}
