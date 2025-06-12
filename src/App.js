@@ -50,63 +50,56 @@ function AppLogic() {
 
   const handleLoginSubmit = async (username, password) => {
     try {
-        const response = await fetch('/api/users/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json',
-            },
-            body: JSON.stringify({ email: username, password: password}),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Something went wrong');
-        }
-
-        localStorage.setItem('token', data.token);
-
-        setIsLoggedIn(true);
-        setIsJustLoggedIn(true);
-        return { success: true };
+      const response = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password: password }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Something went wrong');
+      
+      localStorage.setItem('token', data.token);
+      setIsLoggedIn(true);
+      navigate('/admin');
+      return { success: true };
     } catch (error) {
-        console.error('Login failed', error);
-        
-        return { success: false, message: error.message };
+      console.error('Login failed', error);
+      return { success: false, message: error.message };
     }
   };
   
-  const handleCloseConfirm = useCallback(() => {
-    setConfirmState({ isOpen: false });
-  }, []);
+  const handleCloseConfirm = () => setConfirmState({ isOpen: false });
 
-  const handleLogout = useCallback(() => {
+
+  const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     navigate('/');
     handleCloseConfirm();
-  }, [navigate, handleCloseConfirm]);
+  };
 
-  const fetchQueues = useCallback(async () => {
+
+  const fetchQueues = async () => {
     try {
-        const response = await fetch('/api/queues');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setQueueData(data);
+      const response = await fetch('/api/queues');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setQueueData(data);
     } catch (error) {
-        console.error('Failed to fetch queues:', error);
+      console.error("Failed to fetch queues:", error);
     }
-  }, []);
+  };
 
   useEffect(() => {
-
-    const token = localStorage.getItem('token');
-    if (token) {
+    const initializeApp = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
         setIsLoggedIn(true);
-    }
-    setIsLoading(false);
+      }
+      await fetchQueues();
+      setIsLoading(false);
+    };
+    initializeApp();
   }, []);
 
 
@@ -114,29 +107,20 @@ function AppLogic() {
     fetchQueues();
   }, [fetchQueues]);
 
-  const handleDeleteQueueItem = useCallback(async (queueId) => {
+  const handleDeleteQueueItem = async (queueId) => {
     const token = localStorage.getItem('token');
-
+    handleCloseConfirm();
     try {
-        const response = await fetch(`/api/queues/${queueId}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization' : `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to delete queue from server');
-        }
-        
-        await fetchQueues();
-
+      const response = await fetch(`/api/queues/${queueId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Failed to delete');
+      await fetchQueues();
     } catch (error) {
-        console.error('Error deleting queue:', error);
-    } finally {
-        handleCloseConfirm();
+      console.error('Error deleting queue:', error);
     }
-  }, [fetchQueues ,handleCloseConfirm]);
+  };
 
 
   const handleOpenLogoutConfirm = useCallback(() => {
@@ -149,7 +133,7 @@ function AppLogic() {
     });
   }, [handleLogout]);
 
-  const handleOpenDeleteConfirm = useCallback((queueId) => {
+  const handleOpenDeleteConfirm = (queueId) => {
     setConfirmState({
       isOpen: true,
       title: 'ยืนยันการลบ',
@@ -157,66 +141,48 @@ function AppLogic() {
       onConfirm: () => handleDeleteQueueItem(queueId),
       confirmText: 'ยืนยันการลบ'
     });
-  }, [handleDeleteQueueItem]);
+  };
   
   const handleOpenEditPopup = (item) => { setEditingItem(item); };
   const handleCloseEditPopup = () => { setEditingItem(null); };
 
   const handleUpdateQueueItem = async (updatedItem) => {
     const token = localStorage.getItem('token');
+    handleCloseEditPopup();
     try {
-        
-        const response = await fetch(`/api/queues/${updatedItem._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(updatedItem),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update queue on server');
-        }
-
-        await fetchQueues();
+      const response = await fetch(`/api/queues/${updatedItem._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedItem),
+      });
+      if (!response.ok) throw new Error('Failed to update');
+      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
     } catch (error) {
-        console.error('Error updating queue', error);
-    } finally {
-        handleCloseEditPopup();
+      console.error('Error updating queue:', error);
     }
   };
 
   const handleAddQueueItem = async (newItemData) => {
     const token = localStorage.getItem('token');
+    setShowAddPopup(false);
     try {
-        const response = await fetch ('/api/queues', {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(newItemData),
-        });
-
-        if(!response.ok) {
-            throw new Error('Failed to add queue');
-        }
-
-        await fetchQueues();
-        setShowAddPopup(false);
-
+      const response = await fetch('/api/queues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newItemData),
+      });
+      if (!response.ok) throw new Error('Failed to add');
+      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
     } catch (error) {
-        console.error('Error adding queue:', error);
+      console.error('Error adding queue:', error);
     }
   };
-
-  useEffect(() => {
-    if (isJustLoggedIn) {
-      navigate('/admin');
-      setIsJustLoggedIn(false);
-    }
-  }, [isJustLoggedIn, navigate]);
 
   useEffect(() => {
     if (darkMode) {
