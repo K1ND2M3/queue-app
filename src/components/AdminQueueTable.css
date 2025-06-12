@@ -170,7 +170,7 @@
     background-color: var(--main-color);
 }
 
-.no-results-cell {
+.admin-queue-table tr .no-results-cell {
     text-align: center !important;
     padding: 3rem 1rem !important;
     font-size: 1.1rem;
@@ -201,7 +201,7 @@
     background-color: var(--main-color);
 }
 
-.dark-mode .no-results-cell {
+.dark-mode .admin-queue-table tr .no-results-cell {
     color: #8c8a9e;
 }
 

@@ -31,6 +31,19 @@
   text-align: center;
 }
 
+.public-queue-table tr .no-results-cell {
+    text-align: center !important; 
+    padding: 3rem 1rem !important;
+    font-size: 1.1rem;
+    font-family: var(--poppins-font);
+    color: #888;
+    font-weight: 500;
+}
+
+.dark-mode .public-queue-table tr .no-results-cell {
+  color: #8c8a9e;
+}
+
 .dark-mode .public-queue-table th,
 .dark-mode .public-queue-table td {
     border-bottom: 1px solid var(--text-alter-color);

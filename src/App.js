@@ -203,10 +203,9 @@ function AppLogic() {
             throw new Error('Failed to add queue');
         }
 
-        const savedQueue = await response.json();
-
-        setQueueData(prevData => [...prevData, savedQueue]);
+        await fetchQueues();
         setShowAddPopup(false);
+
     } catch (error) {
         console.error('Error adding queue:', error);
     }
