@@ -108,12 +108,12 @@ function AdminQueueTable({ queueData, onDeleteItem, onEditItem, totalItemCount }
                 ) : (
                     queueData.map((item, index) => (
                         <tr key={item._id}>
-                            <td>{index + 1}</td>
-                            <td>{item.name}</td>
-                            <td>{item.type}</td>
-                            <td><StatusBadge status={item.status} /></td>
-                            <td>{item.createdAt}</td>
-                            <td className="actions-cell">
+                            <td data-label="ลำดับคิว">{index + 1}</td>
+                            <td data-label="ชื่อลูกค้า">{item.name}</td>
+                            <td data-label="ประเภทงาน">{item.type}</td>
+                            <td data-label="สถานะ"><StatusBadge status={item.status} /></td>
+                            <td data-label="วันที่สร้าง">{item.createdAt}</td>
+                            <td data-label="การจัดการ" className="actions-cell">
                                 <button
                                     ref={(el) => (actionButtonRefs.current[item._id] = el)}
                                     className="action-btn"
