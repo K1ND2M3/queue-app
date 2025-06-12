@@ -16,7 +16,6 @@ function AppLogic() {
   const [showLogin, setShowLogin] = useState(false);
   const [queueData, setQueueData] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isJustLoggedIn, setIsJustLoggedIn] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,201 +29,129 @@ function AppLogic() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchQueues = async () => {
-      try {
-        const response = await fetch('/api/queues');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setQueueData(data);
-      } catch (error) {
-        console.error("Failed to fetch queues:", error);
+  const fetchQueues = async () => {
+    try {
+      const response = await fetch('/api/queues');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setQueueData(data);
+    } catch (error) {
+      console.error("Failed to fetch queues:", error);
+    }
+  };
 
+  // --- 2. useEffect สำหรับการตั้งค่าเริ่มต้นของแอป ---
+  useEffect(() => {
+    const initializeApp = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        setIsLoggedIn(true);
       }
+      await fetchQueues(); // ดึงข้อมูลครั้งแรก
+      setIsLoading(false);
     };
-    fetchQueues();
+    initializeApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // --- 3. ฟังก์ชันจัดการข้อมูลทั้งหมดที่ใช้หลักการเดียวกัน ---
 
   const handleLoginSubmit = async (username, password) => {
     try {
-        const response = await fetch('/api/users/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json',
-            },
-            body: JSON.stringify({ email: username, password: password}),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'Something went wrong');
-        }
-
-        localStorage.setItem('token', data.token);
-
-        setIsLoggedIn(true);
-        setIsJustLoggedIn(true);
-        return { success: true };
+      const response = await fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password: password }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Login failed');
+      
+      localStorage.setItem('token', data.token);
+      setIsLoggedIn(true);
+      navigate('/admin');
+      return { success: true };
     } catch (error) {
-        console.error('Login failed', error);
-        
-        return { success: false, message: error.message };
+      console.error('Login failed', error);
+      return { success: false, message: error.message };
     }
   };
-  
-  const handleCloseConfirm = useCallback(() => {
-    setConfirmState({ isOpen: false });
-  }, []);
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     navigate('/');
     handleCloseConfirm();
-  }, [navigate, handleCloseConfirm]);
+  };
 
-  const fetchQueues = useCallback(async () => {
-    try {
-        const response = await fetch('/api/queues');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setQueueData(data);
-    } catch (error) {
-        console.error('Failed to fetch queues:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-
+  const handleDeleteQueueItem = async (queueId) => {
     const token = localStorage.getItem('token');
-    if (token) {
-        setIsLoggedIn(true);
-    }
-    setIsLoading(false);
-  }, []);
-
-
-  useEffect(() => {
-    fetchQueues();
-  }, [fetchQueues]);
-
-  const handleDeleteQueueItem = useCallback(async (queueId) => {
-    const token = localStorage.getItem('token');
-
+    handleCloseConfirm();
     try {
-        const response = await fetch(`/api/queues/${queueId}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization' : `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to delete queue from server');
-        }
-        
-        await fetchQueues();
-
+      const response = await fetch(`/api/queues/${queueId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Failed to delete queue');
+      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
     } catch (error) {
-        console.error('Error deleting queue:', error);
-    } finally {
-        handleCloseConfirm();
+      console.error('Error deleting queue:', error);
     }
-  }, [fetchQueues ,handleCloseConfirm]);
-
-
-  const handleOpenLogoutConfirm = useCallback(() => {
-    setConfirmState({
-      isOpen: true,
-      title: 'ยืนยันการออกจากระบบ',
-      message: 'คุณต้องการออกจากระบบใช่หรือไม่?',
-      onConfirm: handleLogout,
-      confirmText: 'ออกจากระบบ'
-    });
-  }, [handleLogout]);
-
-  const handleOpenDeleteConfirm = useCallback((queueId) => {
-    setConfirmState({
-      isOpen: true,
-      title: 'ยืนยันการลบ',
-      message: 'คุณแน่ใจหรือไม่ว่าจะลบคิวนี้?',
-      onConfirm: () => handleDeleteQueueItem(queueId),
-      confirmText: 'ยืนยันการลบ'
-    });
-  }, [handleDeleteQueueItem]);
-  
-  const handleOpenEditPopup = (item) => { setEditingItem(item); };
-  const handleCloseEditPopup = () => { setEditingItem(null); };
+  };
 
   const handleUpdateQueueItem = async (updatedItem) => {
     const token = localStorage.getItem('token');
+    handleCloseEditPopup();
     try {
-        
-        const response = await fetch(`/api/queues/${updatedItem._id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(updatedItem),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to update queue on server');
-        }
-
-        await fetchQueues();
+      const response = await fetch(`/api/queues/${updatedItem._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedItem),
+      });
+      if (!response.ok) throw new Error('Failed to update queue');
+      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
     } catch (error) {
-        console.error('Error updating queue', error);
-    } finally {
-        handleCloseEditPopup();
+      console.error('Error updating queue:', error);
     }
   };
 
   const handleAddQueueItem = async (newItemData) => {
     const token = localStorage.getItem('token');
+    setShowAddPopup(false);
     try {
-        const response = await fetch ('/api/queues', {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(newItemData),
-        });
-
-        if(!response.ok) {
-            throw new Error('Failed to add queue');
-        }
-
-        const savedQueue = await response.json();
-
-        setQueueData(prevData => [...prevData, savedQueue]);
-        setShowAddPopup(false);
+      const response = await fetch('/api/queues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // เพิ่ม Authorization Header
+        },
+        body: JSON.stringify(newItemData),
+      });
+      if (!response.ok) throw new Error('Failed to add queue');
+      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
     } catch (error) {
-        console.error('Error adding queue:', error);
+      console.error('Error adding queue:', error);
     }
   };
 
-  useEffect(() => {
-    if (isJustLoggedIn) {
-      navigate('/admin');
-      setIsJustLoggedIn(false);
-    }
-  }, [isJustLoggedIn, navigate]);
+  const handleCloseConfirm = () => setConfirmState({ isOpen: false });
+  const handleOpenLogoutConfirm = () => setConfirmState({
+      isOpen: true, title: 'ยืนยันการออกจากระบบ', message: 'คุณต้องการออกจากระบบใช่หรือไม่?',
+      onConfirm: handleLogout, confirmText: 'ออกจากระบบ'
+  });
+  const handleOpenDeleteConfirm = (queueId) => setConfirmState({
+      isOpen: true, title: 'ยืนยันการลบ', message: 'คุณแน่ใจหรือไม่ว่าจะลบคิวนี้?',
+      onConfirm: () => handleDeleteQueueItem(queueId), confirmText: 'ยืนยันการลบ'
+  });
+  const handleOpenEditPopup = (item) => { setEditingItem(item); };
+  const handleCloseEditPopup = () => { setEditingItem(null); };
 
+  // useEffect สำหรับ Dark Mode
   useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
+    if (darkMode) { document.body.classList.add('dark-mode'); } 
+    else { document.body.classList.remove('dark-mode'); }
     return () => { document.body.classList.remove('dark-mode'); }
   }, [darkMode]);
 
