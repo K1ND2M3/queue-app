@@ -29,7 +29,7 @@ function QueueTable({ queueData }) {
           {queueData && queueData.length > 0 ? (
             queueData.map((queueItem, index) => (
               <tr key={queueItem._id}>
-                <td>
+                <td data-label="ลำดับคิว">
                   <div className='queue-number'>
                     <span>{index + 1}</span>
                   </div>
