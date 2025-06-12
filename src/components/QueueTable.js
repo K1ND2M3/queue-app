@@ -38,9 +38,9 @@ function QueueTable({ queueData }) {
                     <span>{index + 1}</span>
                   </div>
                 </td>
-                <td data-label="ลำดับคิว">{queueItem.name}</td>
-                <td data-label="ลำดับคิว">{queueItem.type}</td>
-                <td data-label="ลำดับคิว"><StatusBadge status={queueItem.status} /></td>
+                <td data-label="ชื่อ">{queueItem.name}</td>
+                <td data-label="ประเภทงาน">{queueItem.type}</td>
+                <td data-label="สถานะ"><StatusBadge status={queueItem.status} /></td>
               </tr>
             ))
           ) : (
