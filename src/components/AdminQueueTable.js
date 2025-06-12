@@ -108,7 +108,7 @@ function AdminQueueTable({ queueData, onDeleteItem, onEditItem, totalItemCount }
                 ) : (
                     queueData.map((item, index) => (
                         <tr key={item._id}>
-                            <td data-label="ลำดับคิว">{index + 1}</td>
+                            <td data-label="ลำดับคิว">{item.order}</td>
                             <td data-label="ชื่อลูกค้า">{item.name}</td>
                             <td data-label="ประเภทงาน">{item.type}</td>
                             <td data-label="สถานะ"><StatusBadge status={item.status} /></td>

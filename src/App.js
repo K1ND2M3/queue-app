@@ -23,7 +23,7 @@ function AppLogic() {
 
   const navigate = useNavigate();
 
-  // 1. ฟังก์ชันดึงข้อมูลหลัก (ไม่ต้องใช้ useCallback)
+
   const fetchQueues = async () => {
     try {
       const response = await fetch('/api/queues');
@@ -35,7 +35,7 @@ function AppLogic() {
     }
   };
 
-  // 2. useEffect สำหรับการตั้งค่าเริ่มต้นของแอป
+
   useEffect(() => {
     const initializeApp = async () => {
       const token = localStorage.getItem('token');
@@ -46,10 +46,8 @@ function AppLogic() {
       setIsLoading(false);
     };
     initializeApp();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- 3. ฟังก์ชันจัดการข้อมูลทั้งหมดที่ใช้หลักการเดียวกัน ---
 
   const handleLoginSubmit = async (username, password) => {
     try {
@@ -60,6 +58,8 @@ function AppLogic() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Login failed');
+
+
       localStorage.setItem('token', data.token);
       setIsLoggedIn(true);
       navigate('/admin');
@@ -86,7 +86,7 @@ function AppLogic() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error('Failed to delete');
-      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
+      await fetchQueues();
     } catch (error) {
       console.error('Error deleting queue:', error);
     }
@@ -102,7 +102,7 @@ function AppLogic() {
         body: JSON.stringify(updatedItem),
       });
       if (!response.ok) throw new Error('Failed to update');
-      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
+      await fetchQueues();
     } catch (error) {
       console.error('Error updating queue:', error);
     }
@@ -118,20 +118,18 @@ function AppLogic() {
         body: JSON.stringify(newItemData),
       });
       if (!response.ok) throw new Error('Failed to add');
-      await fetchQueues(); // เมื่อสำเร็จ ให้ดึงข้อมูลใหม่
+      await fetchQueues();
     } catch (error) {
       console.error('Error adding queue:', error);
     }
   };
 
-  // --- ฟังก์ชันสำหรับเปิด-ปิด Popup (ไม่มีการเปลี่ยนแปลง) ---
   const handleCloseConfirm = () => setConfirmState({ isOpen: false });
   const handleOpenLogoutConfirm = () => setConfirmState({ isOpen: true, title: 'ยืนยันการออกจากระบบ', message: 'คุณต้องการออกจากระบบใช่หรือไม่?', onConfirm: handleLogout, confirmText: 'ออกจากระบบ' });
   const handleOpenDeleteConfirm = (queueId) => setConfirmState({ isOpen: true, title: 'ยืนยันการลบ', message: 'คุณแน่ใจหรือไม่ว่าจะลบคิวนี้?', onConfirm: () => handleDeleteQueueItem(queueId), confirmText: 'ยืนยันการลบ' });
   const handleOpenEditPopup = (item) => { setEditingItem(item); };
   const handleCloseEditPopup = () => { setEditingItem(null); };
 
-  // useEffect สำหรับ Dark Mode
   useEffect(() => {
     if (darkMode) { document.body.classList.add('dark-mode'); } 
     else { document.body.classList.remove('dark-mode'); }
