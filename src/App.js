@@ -143,20 +143,23 @@ function AppLogic() {
     const token = localStorage.getItem('token');
     setShowAddPopup(false);
     
+    // ประกาศ mockItem นอกบล็อก try-catch เพื่อให้เข้าถึงได้ทั่วทั้งฟังก์ชัน
+    let mockItem = null;
+
     try {
-      // 1. สร้าง mock data สำหรับอัพเดต UI ทันที
-      const mockItem = {
+      // 1. สร้าง mock data สำหรับ Optimistic UI
+      mockItem = {
         ...newItemData,
-        _id: Date.now().toString(), // ID ชั่วคราว
+        _id: `mock-${Date.now()}`, // ใช้ prefix "mock-" เพื่อระบุว่าเป็นข้อมูลชั่วคราว
         status: 'รอดำเนินการ',
         createdAt: new Date().toLocaleDateString('th-TH'),
-        order: Math.max(...queueData.map(q => q.order), 0) + 1 // สร้าง order ชั่วคราว
+        order: queueData.length > 0 ? Math.max(...queueData.map(q => q.order)) + 1 : 1
       };
-      
-      // 2. อัพเดต UI ทันที
+
+      // 2. อัพเดต UI ทันทีด้วย mock data
       setQueueData(prev => [...prev, mockItem]);
-      
-      // 3. ส่ง request เพิ่มข้อมูลจริงไปที่ backend
+
+      // 3. ส่ง request จริงไปยัง backend
       const response = await fetch('/api/queues', {
         method: 'POST',
         headers: { 
@@ -165,19 +168,24 @@ function AppLogic() {
         },
         body: JSON.stringify(newItemData),
       });
-      
+
       if (!response.ok) throw new Error('Failed to add');
-      
-      // 4. แทนที่ mock data ด้วยข้อมูลจริงจาก server (optional)
+
+      // 4. แทนที่ mock data ด้วยข้อมูลจริงจาก server
       const addedItem = await response.json();
       setQueueData(prev => 
         prev.map(item => item._id === mockItem._id ? addedItem : item)
       );
-      
+
     } catch (error) {
       console.error('Error adding queue:', error);
-      // ย้อนกลับ state โดยลบ mock data ออก
-      setQueueData(prev => prev.filter(item => item._id !== mockItem._id));
+      // 5. ย้อนกลับ state โดยลบ mock data ออก (ถ้ามี)
+      if (mockItem) {
+        setQueueData(prev => prev.filter(item => item._id !== mockItem._id));
+      }
+      // หรือโหลดข้อมูลใหม่จาก server เพื่อความปลอดภัย
+      // const refreshedData = await fetchQueues();
+      // setQueueData(refreshedData);
     }
   };
   
