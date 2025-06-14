@@ -49,6 +49,14 @@ function AppLogic() {
     initializeApp();
   }, []);
 
+  useEffect(() => {
+  const interval = setInterval(() => {
+    fetchQueues(); // เรียกฟังก์ชันดึงข้อมูลคิวใหม่ทุก 1 นาที
+  }, 60000);
+
+  return () => clearInterval(interval);
+}, []);
+
 
   const handleLoginSubmit = async (username, password) => {
     try {
