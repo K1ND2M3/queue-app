@@ -125,27 +125,48 @@ function AppLogic() {
     handleCloseEditPopup();
     
     try {
-      // 1. อัพเดต UI ทันทีด้วยข้อมูลใหม่
-      setQueueData(prev => 
-        prev.map(item => item._id === updatedItem._id ? updatedItem : item)
-      );
-      
-      // 2. ส่ง request อัพเดตไปที่ backend
+      // 1. Optimistic Update: อัปเดต UI ทันที
+      setQueueData(prev => {
+        const oldItem = prev.find(item => item._id === updatedItem._id);
+        if (!oldItem) return prev;
+
+        return prev.map(item => {
+          // คิวที่ถูกแก้ไข
+          if (item._id === updatedItem._id) return updatedItem;
+          
+          // คิวอื่นๆ ที่ต้องเลื่อนลำดับ
+          if (updatedItem.order < oldItem.order) {
+            if (item.order >= updatedItem.order && item.order < oldItem.order) {
+              return { ...item, order: item.order + 1 };
+            }
+          } else {
+            if (item.order > oldItem.order && item.order <= updatedItem.order) {
+              return { ...item, order: item.order - 1 };
+            }
+          }
+          return item;
+        }).sort((a, b) => a.order - b.order);
+      });
+
+      // 2. ส่ง request ไป backend
       const response = await fetch(`/api/queues/${updatedItem._id}`, {
         method: 'PUT',
         headers: { 
-          'Content-Type': 'application/json', 
-          'Authorization': `Bearer ${token}` 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(updatedItem),
+        body: JSON.stringify(updatedItem)
       });
-      
-      // 3. หากล้มเหลว -> ย้อนกลับ state
+
       if (!response.ok) throw new Error('Failed to update');
-      
+
+      // 3. รับข้อมูลล่าสุดจาก server
+      const updatedQueues = await response.json();
+      setQueueData(updatedQueues);
+
     } catch (error) {
       console.error('Error updating queue:', error);
-      // ย้อนกลับ state โดย fetch ข้อมูลใหม่
+      // 4. ย้อนกลับ state หากล้มเหลว
       const refreshedData = await fetchQueues();
       setQueueData(refreshedData);
     }
