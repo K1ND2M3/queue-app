@@ -83,24 +83,37 @@ function AppLogic() {
     setIsMutating(true);
     const token = localStorage.getItem('token');
     handleCloseConfirm();
-    
+
     try {
-      // 1. อัพเดต UI ทันที
-      setQueueData(prev => prev.filter(item => item._id !== queueId));
-      
-      // 2. ส่ง request ลบข้อมูล (ไม่ต้องรอ response)
+      // 1. Optimistic Update: ลบและอัปเดต order ใน UI ทันที
+      setQueueData(prev => {
+        const deletedItem = prev.find(item => item._id === queueId);
+        if (!deletedItem) return prev;
+
+        return prev
+          .filter(item => item._id !== queueId)
+          .map(item => ({
+            ...item,
+            order: item.order > deletedItem.order ? item.order - 1 : item.order
+          }));
+      });
+
+      // 2. ส่ง request ลบไปที่ backend
       const response = await fetch(`/api/queues/${queueId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      
-      // 3. หากล้มเหลว -> ย้อนกลับ state
+
       if (!response.ok) throw new Error('Failed to delete');
-      
+
+      // 3. รับข้อมูลล่าสุดจาก server (optional)
+      const updatedQueues = await response.json();
+      setQueueData(updatedQueues);
+
     } catch (error) {
       console.error('Error deleting queue:', error);
-      // ย้อนกลับ state โดย fetch ข้อมูลใหม่
-      const refreshedData = await fetchQueues(); // เรียกฟังก์ชัน fetchQueues ที่มีอยู่
+      // 4. ย้อนกลับ state หากล้มเหลว
+      const refreshedData = await fetchQueues();
       setQueueData(refreshedData);
     } finally {
       setIsMutating(false);
