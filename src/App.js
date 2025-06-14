@@ -52,7 +52,7 @@ function AppLogic() {
   useEffect(() => {
   const interval = setInterval(() => {
     fetchQueues(); // เรียกฟังก์ชันดึงข้อมูลคิวใหม่ทุก 1 นาที
-  }, 60000);
+  }, 30000);
 
   return () => clearInterval(interval);
 }, []);
