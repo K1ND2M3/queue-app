@@ -20,6 +20,7 @@ function AppLogic() {
   const [editingItem, setEditingItem] = useState(null);
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [confirmState, setConfirmState] = useState({ isOpen: false });
+  const [isMutating, setIsMutating] = useState(false);
 
   const navigate = useNavigate();
 
@@ -78,51 +79,108 @@ function AppLogic() {
   };
 
   const handleDeleteQueueItem = async (queueId) => {
+    if (isMutating) return;
+    setIsMutating(true);
     const token = localStorage.getItem('token');
     handleCloseConfirm();
+    
     try {
+      // 1. อัพเดต UI ทันที
+      setQueueData(prev => prev.filter(item => item._id !== queueId));
+      
+      // 2. ส่ง request ลบข้อมูล (ไม่ต้องรอ response)
       const response = await fetch(`/api/queues/${queueId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      // 3. หากล้มเหลว -> ย้อนกลับ state
       if (!response.ok) throw new Error('Failed to delete');
-      await fetchQueues();
+      
     } catch (error) {
       console.error('Error deleting queue:', error);
+      // ย้อนกลับ state โดย fetch ข้อมูลใหม่
+      const refreshedData = await fetchQueues(); // เรียกฟังก์ชัน fetchQueues ที่มีอยู่
+      setQueueData(refreshedData);
+    } finally {
+      setIsMutating(false);
     }
   };
 
   const handleUpdateQueueItem = async (updatedItem) => {
     const token = localStorage.getItem('token');
     handleCloseEditPopup();
+    
     try {
+      // 1. อัพเดต UI ทันทีด้วยข้อมูลใหม่
+      setQueueData(prev => 
+        prev.map(item => item._id === updatedItem._id ? updatedItem : item)
+      );
+      
+      // 2. ส่ง request อัพเดตไปที่ backend
       const response = await fetch(`/api/queues/${updatedItem._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify(updatedItem),
       });
+      
+      // 3. หากล้มเหลว -> ย้อนกลับ state
       if (!response.ok) throw new Error('Failed to update');
-      await fetchQueues();
+      
     } catch (error) {
       console.error('Error updating queue:', error);
+      // ย้อนกลับ state โดย fetch ข้อมูลใหม่
+      const refreshedData = await fetchQueues();
+      setQueueData(refreshedData);
     }
   };
+
   
   const handleAddQueueItem = async (newItemData) => {
     const token = localStorage.getItem('token');
     setShowAddPopup(false);
+    
     try {
+      // 1. สร้าง mock data สำหรับอัพเดต UI ทันที
+      const mockItem = {
+        ...newItemData,
+        _id: Date.now().toString(), // ID ชั่วคราว
+        status: 'รอดำเนินการ',
+        createdAt: new Date().toLocaleDateString('th-TH'),
+        order: Math.max(...queueData.map(q => q.order), 0) + 1 // สร้าง order ชั่วคราว
+      };
+      
+      // 2. อัพเดต UI ทันที
+      setQueueData(prev => [...prev, mockItem]);
+      
+      // 3. ส่ง request เพิ่มข้อมูลจริงไปที่ backend
       const response = await fetch('/api/queues', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': `Bearer ${token}` 
+        },
         body: JSON.stringify(newItemData),
       });
+      
       if (!response.ok) throw new Error('Failed to add');
-      await fetchQueues();
+      
+      // 4. แทนที่ mock data ด้วยข้อมูลจริงจาก server (optional)
+      const addedItem = await response.json();
+      setQueueData(prev => 
+        prev.map(item => item._id === mockItem._id ? addedItem : item)
+      );
+      
     } catch (error) {
       console.error('Error adding queue:', error);
+      // ย้อนกลับ state โดยลบ mock data ออก
+      setQueueData(prev => prev.filter(item => item._id !== mockItem._id));
     }
   };
+  
 
   const handleCloseConfirm = () => setConfirmState({ isOpen: false });
   const handleOpenLogoutConfirm = () => setConfirmState({ isOpen: true, title: 'ยืนยันการออกจากระบบ', message: 'คุณต้องการออกจากระบบใช่หรือไม่?', onConfirm: handleLogout, confirmText: 'ออกจากระบบ' });
